@@ -47,7 +47,7 @@ std::pair<double, std::vector<std::wstring>> ReadConfig(const std::string& confi
         std::ofstream newConfigFile(configFilePath);
         if (newConfigFile.is_open()) {
             newConfigFile << "threshold=" << defaultThreshold << std::endl;
-            newConfigFile << "drive=C,D" << std::endl;
+            newConfigFile << "drive=C" << std::endl;
             newConfigFile.close();
         }
         drives.push_back(defaultDrive);
@@ -56,7 +56,15 @@ std::pair<double, std::vector<std::wstring>> ReadConfig(const std::string& confi
     return { threshold, drives };
 }
 
-void CheckDriveSpace(const std::vector<std::wstring>& drives, double threshold) {
+void LogInfo(const std::wstring& logFilePath, const std::wstring& message) {
+    std::wofstream logFile(logFilePath, std::ios::app);
+    if (logFile.is_open()) {
+        logFile << message << std::endl;
+        logFile.close();
+    }
+}
+
+void CheckDriveSpace(const std::vector<std::wstring>& drives, double threshold, const std::wstring& logFilePath) {
     for (const auto& drive : drives) {
         std::wstring formattedDrive = drive + L":\\";
         ULARGE_INTEGER freeBytesAvailable, totalBytes, totalFreeBytes;
@@ -64,11 +72,15 @@ void CheckDriveSpace(const std::vector<std::wstring>& drives, double threshold) 
             double freeSpaceGB = static_cast<double>(totalFreeBytes.QuadPart) / (1024 * 1024 * 1024);
             freeSpaceGB = std::round(freeSpaceGB * 100) / 100; // Round to 2 decimal places
 
+            std::wstring logMessage = L"Drive: " + drive + L", Free space: " + std::to_wstring(freeSpaceGB) + L" GB";
+            LogInfo(logFilePath, logMessage);
+
             if (freeSpaceGB < threshold) {
                 std::wstring message = L"Warning: Free disk space on " + drive +
                     L" is below " + std::to_wstring(threshold) + L" GB.\n" +
                     L"Current free space: " + std::to_wstring(freeSpaceGB) + L" GB.";
                 ShowMessageBox(message, L"Disk Space Alert");
+                LogInfo(logFilePath, L"Alert: " + message);
             }
         }
     }
@@ -78,18 +90,23 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     const std::string configFilePath = "config.ini";
     const double defaultThreshold = 50.0;
     const std::wstring defaultDrive = L"C";
+    const std::wstring logFilePath = L"log.txt";
+
+    // Reset the log file
+    std::wofstream logFile(logFilePath, std::ios::trunc);
+    logFile.close();
 
     auto [threshold, drives] = ReadConfig(configFilePath, defaultThreshold, defaultDrive); // This line uses structured bindings
 
-    // Debug output to check the parsed drives and threshold
-    std::wcout << L"Threshold: " << threshold << L" GB" << std::endl;
-    std::wcout << L"Drives: ";
+    // Log parsed config values
+    LogInfo(logFilePath, L"Threshold: " + std::to_wstring(threshold) + L" GB");
+    std::wstring drivesLogMessage = L"Drives: ";
     for (const auto& drive : drives) {
-        std::wcout << drive << L" ";
+        drivesLogMessage += drive + L" ";
     }
-    std::wcout << std::endl;
+    LogInfo(logFilePath, drivesLogMessage);
 
-    CheckDriveSpace(drives, threshold);
+    CheckDriveSpace(drives, threshold, logFilePath);
 
     return 0;
 }

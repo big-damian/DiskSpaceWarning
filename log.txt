@@ -1,0 +1,6 @@
+Threshold: 70.000000 GB
+Drives: C D 
+Drive: C, Free space: 77.700000 GB
+Drive: D, Free space: 34.120000 GB
+Alert: Warning: Free disk space on D is below 70.000000 GB.
+Current free space: 34.120000 GB.
