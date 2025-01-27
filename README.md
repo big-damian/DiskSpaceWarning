@@ -52,11 +52,12 @@ Alerts when free disk space is below the threshold.
 
 ## Example Output
 
-When the application runs, it logs information to log.txt like this:
+When the application runs, if the free disk space is below the threshold a warning window will pop up,
+in any other case it will log the information to log.txt like this:
 
 ```txt file
 Threshold: 150 GB
-Drives: C D
+Drives: C, D
 Drive: C, Free space: 100.00 GB
 Drive: D, Free space: 200.00 GB
 Alert: Warning: Free disk space on C is below 150 GB.
