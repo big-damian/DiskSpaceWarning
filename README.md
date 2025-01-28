@@ -2,7 +2,7 @@
 
 **Disk Space Warning** is a small silent and standalone application for Windows designed to be run periodically with **task scheduler** that checks the available disk space on a specified drive. If the available space falls below a user-defined threshold, the app displays a warning message. The threshold can be configured via a simple `config.ini` file.
 
-![Alert window](img/alert_window.png)
+![Alert window](img/dsw_alert_window_screenshot.png)
 
 ---
 
@@ -41,6 +41,10 @@ Run the application executable.
 The application will read the configuration file and monitor the specified drives.
 
 If the free disk space on any monitored drive falls below the threshold, a warning message will be displayed, and the event will be logged to log.txt.
+
+To use with Windows Task Scheduler don't forget to set the option "Start in (optional)" to the same path where the executable is (without quotation marks " ):
+
+![Alert window](img/dsw_task_scheduler_screenshot.png)
 
 ## Logs
 
